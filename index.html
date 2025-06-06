@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Mapa con Marcador al Click y Formulario</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet"href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="estilos.css">
+
+<style>
+/*body {
+  margin: 0;
+  background: #cce7ff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+#map {
+  height: 500px;
+  width: 90%;
+  margin: 20px auto;
+  border: 2px solid #005a9c;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+form {
+  width: 90%;
+  max-width: 600px;
+  margin: 20px auto 40px auto;
+  padding: 15px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+form input, form textarea, form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+form button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #005a9c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+form button:hover {
+  background: #004080;
+}
+</style>*/
+</head>
+<body>
+<h1>Mapa 🌎</h1>
+<div id="map"></div>
+
+<form id="locationForm">
+  <label for="lat">Latitud:</label>
+  <input type="text" id="lat" name="lat" readonly />
+
+  <label for="lng">Longitud:</label>
+  <input type="text" id="lng" name="lng" readonly />
+
+  <label for="placeName">Nombre del lugar:</label>
+  <input type="text" id="placeName" name="placeName" placeholder="Ejemplo: Parque Central" required />
+
+  <label for="description">Descripción:</label>
+  <textarea id="description" name="description" rows="3" placeholder="Descripción opcional"></textarea>
+
+  <label for="placeType">Tipo de lugar:</label>
+  <select id="placeType" name="placeType" required>
+    <option value="">Selecciona...</option>
+    <option value="vecindario">Vecindario</option>
+    <option value="parque">Parque</option>
+    <option value="monumento">Monumento</option>
+    <option value="edificio">Edificio</option>
+    <option value="otro">Otro</option>
+  </select>
+
+  <button type="submit">Guardar</button>
+</form>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map("map").setView([20, 0], 2);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "&copy; OpenStreetMap contributors",
+}).addTo(map);
+
+let currentMarker = null;
+
+map.on("click", function (e) {
+  const lat = e.latlng.lat.toFixed(6);
+  const lng = e.latlng.lng.toFixed(6);
+
+  // Quitar marcador anterior si existe
+  if (currentMarker) {
+    map.removeLayer(currentMarker);
+  }
+
+  // Agregar nuevo marcador
+  currentMarker = L.marker([lat, lng]).addTo(map);
+
+  // Actualizar formulario con lat/lng
+  document.getElementById("lat").value = lat;
+  document.getElementById("lng").value = lng;
+});
+
+// Manejar el submit del formulario
+document.getElementById("locationForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const lat = document.getElementById("lat").value;
+  const lng = document.getElementById("lng").value;
+  const name = document.getElementById("placeName").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const type = document.getElementById("placeType").value;
+
+  if (!lat || !lng) {
+    alert("Por favor, haz clic en el mapa para seleccionar una ubicación.");
+    return;
+  }
+
+  if (!name || !type) {
+    alert("Por favor, completa los campos requeridos.");
+    return;
+  }
+
+  alert(`Lugar guardado:\nNombre: ${name}\nTipo: ${type}\nLatitud: ${lat}\nLongitud: ${lng}\nDescripción: ${description}`);
+
+  // Aquí puedes agregar la lógica para guardar en backend o localStorage
+
+  // Opcional: limpiar formulario pero dejar lat/lng para editar
+  // this.reset();
+});
+</script>
+</body>
+</html>
